@@ -1,7 +1,8 @@
-import 'package:expense_planner/widgets/new_transaction.dart';
 import 'package:flutter/material.dart';
 
-import './widgets/user_transaction.dart';
+import './widgets/transaction_list.dart';
+import './widgets/new_transaction.dart';
+import './models/transaction.dart';
 
 void main() => runApp(MyApp());
 
@@ -9,31 +10,83 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Personal Expenses',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+          primarySwatch: Colors.purple,
+          accentColor: Colors.amber,
+          fontFamily: 'Quicksand',
+          appBarTheme: AppBarTheme(
+            textTheme: ThemeData.light().textTheme.copyWith(
+                  title: TextStyle(
+                    fontFamily: 'OpenSans',
+                    fontSize: 20,
+                  ),
+                ),
+          )),
       home: MyHomePage(),
     );
   }
 }
 
-class MyHomePage extends StatelessWidget {
-void startAddnewTransaction(BuildContext ctx){
-  showModalBottomSheet(context: ctx,builder: (_){
-    return ;//NewTransaction(addTransaction);
-  });
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
 }
+
+class _MyHomePageState extends State<MyHomePage> {
+  final List<Transaction> _userTransactions = [
+    Transaction(
+      id: 't1',
+      title: 'New Shoes',
+      amount: 540.99,
+      date: DateTime.now(),
+    ),
+    Transaction(
+      id: 't2',
+      title: 'Weekly Groceries',
+      amount: 580.99,
+      date: DateTime.now(),
+    ),
+  ];
+
+  void _addNewTransaction(String title, double amount) {
+    final newTx = Transaction(
+      id: DateTime.now().toString(),
+      title: title,
+      amount: amount,
+      date: DateTime.now(),
+    );
+
+    setState(() {
+      _userTransactions.add(newTx);
+    });
+  }
+
+  void _startAddNewTrasaction(BuildContext ctx) {
+    showModalBottomSheet(
+      context: ctx,
+      builder: (_) {
+        return GestureDetector(
+          onTap: () {},
+          child: NewTransaction(_addNewTransaction),
+          behavior: HitTestBehavior.opaque,
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flutter App'),
+        title: Text(
+          'Flutter App',
+          style: TextStyle(fontFamily: 'Open Sans'),
+        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
-            onPressed: () {},
+            onPressed: () => _startAddNewTrasaction(context),
           )
         ],
       ),
@@ -50,17 +103,14 @@ void startAddnewTransaction(BuildContext ctx){
                 elevation: 5,
               ),
             ),
-            UserTransaction(),
+            TransactionList(_userTransactions),
           ],
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {
-
-        },
-      ),
+          child: Icon(Icons.add),
+          onPressed: () => _startAddNewTrasaction(context)),
     );
   }
 }
